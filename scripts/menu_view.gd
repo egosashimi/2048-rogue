@@ -41,7 +41,7 @@ func _on_currency_changed(_amount: int) -> void:
 func _refresh_currency() -> void:
 	var progression := _get_progression_singleton()
 	if progression != null and progression.has_method("get_currency"):
-		var currency := progression.get_currency()
+		var currency: int = progression.get_currency()
 		currency_label.text = "Currency: %d" % currency
 	else:
 		currency_label.text = "Currency: --"

@@ -58,7 +58,7 @@ func _update_label() -> void:
 		if stylebox != null:
 			add_theme_stylebox_override("panel", stylebox)
 		var use_dark_font := value >= 128
-		var color_name := use_dark_font ? "fg_dark" : "fg_light"
+		var color_name := "fg_dark" if use_dark_font else "fg_light"
 		var font_color := theme.get_color(color_name, "Tile")
 		value_label.add_theme_color_override("font_color", font_color)
 	var target_size := _font_size_for_value(value)

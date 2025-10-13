@@ -15,7 +15,7 @@ func load_save() -> Dictionary:
 	if file == null:
 		return _default_save()
 	var text := file.get_as_text()
-	var parsed := JSON.parse_string(text)
+	var parsed = JSON.parse_string(text)
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return _default_save()
 	var save_dict: Dictionary = parsed
@@ -36,6 +36,7 @@ func _default_save() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,
 		"best_score": 0,
+		"last_seed": 0,
 		"currency": 0,
 		"upgrades": {},
 		"statistics": {}

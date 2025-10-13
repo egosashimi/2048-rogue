@@ -26,6 +26,8 @@ var score: int = 0
 var best_score: int = 0
 var move_count: int = 0
 var highest_tile: int = 0
+var current_seed: int = 0
+var active_modifiers: Array = []
 var tiles: Dictionary = {}
 var tile_positions: Dictionary = {}
 var is_animating: bool = false
@@ -63,7 +65,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _on_board_resized() -> void:
 	_update_board_layout()
 
-func _on_run_started() -> void:
+func _on_run_started(seed: int = 0, modifiers: Array = []) -> void:
+	current_seed = seed
+	active_modifiers = modifiers.duplicate(true)
 	_start_new_run()
 
 func _start_new_run() -> void:
@@ -266,7 +270,9 @@ func _end_run(result: Dictionary) -> void:
 		"score": score,
 		"moves": move_count,
 		"highest_tile": highest_tile,
-		"best_score": best_score
+		"best_score": best_score,
+		"seed": current_seed,
+		"modifiers": active_modifiers.duplicate(true)
 	}
 	for key in result.keys():
 		final_result[key] = result[key]
@@ -278,6 +284,7 @@ func _end_run(result: Dictionary) -> void:
 		if "data" in save_node and typeof(save_node.data) == TYPE_DICTIONARY:
 			save_snapshot = save_node.data.duplicate(true)
 		save_snapshot["best_score"] = best_score
+		save_snapshot["last_seed"] = current_seed
 		if progression_node != null:
 			save_snapshot["currency"] = progression_node.currency
 			save_snapshot["upgrades"] = progression_node.upgrades

@@ -44,3 +44,45 @@ text = "Best: 0"
 
 [node name="MovesLabel" type="Label" parent="HUD/HUDContainer"]
 text = "Moves: 0"
+
+[node name="CurrencyLabel" type="Label" parent="HUD/HUDContainer"]
+text = "Currency: 0"
+
+[node name="ModifiersLabel" type="Label" parent="HUD/HUDContainer"]
+text = "Modifiers: None"
+size_flags_horizontal = 4
+
+[node name="PowerupsBar" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_left = 0.05
+anchor_top = 0.84
+anchor_right = 0.95
+anchor_bottom = 0.98
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="PowerupsBar"]
+text = "Powerups"
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="PowerupsBar"]
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="UndoButton" type="Button" parent="PowerupsBar/Buttons"]
+text = "Undo"
+size_flags_horizontal = 4
+
+[node name="ShuffleButton" type="Button" parent="PowerupsBar/Buttons"]
+text = "Shuffle"
+size_flags_horizontal = 4
+
+[node name="ClearLowestButton" type="Button" parent="PowerupsBar/Buttons"]
+text = "Clear Lowest"
+size_flags_horizontal = 4
+
+[node name="MergeBoostButton" type="Button" parent="PowerupsBar/Buttons"]
+text = "Merge Boost"
+size_flags_horizontal = 4

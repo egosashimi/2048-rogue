@@ -22,6 +22,7 @@ var active_modifiers: Array = []
 
 var run_manager: RunManager = null
 var _next_seed_override: int = 0
+var pending_modifiers: Array = []
 
 func _ready() -> void:
 	_ensure_input_actions()
@@ -44,13 +45,22 @@ func set_input_locked(value: bool) -> void:
 func configure_next_seed(seed: int) -> void:
 	_next_seed_override = seed
 
+func set_pending_modifiers(modifiers: Array) -> void:
+	pending_modifiers = modifiers.duplicate(true)
+
+func get_pending_modifiers() -> Array:
+	return pending_modifiers.duplicate(true)
+
 func notify_run_started(seed_override: int = 0, modifiers: Array = []) -> void:
 	_ensure_run_manager()
 	var effective_seed := seed_override
 	if effective_seed == 0 and _next_seed_override != 0:
 		effective_seed = _next_seed_override
 	_next_seed_override = 0
-	run_manager.start_run(effective_seed, modifiers)
+	var final_modifiers := modifiers.duplicate(true)
+	if final_modifiers.is_empty():
+		final_modifiers = pending_modifiers.duplicate(true)
+	run_manager.start_run(effective_seed, final_modifiers)
 
 func notify_run_ended(result: Dictionary) -> void:
 	_ensure_run_manager()

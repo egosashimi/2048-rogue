@@ -1,19 +1,31 @@
 extends RefCounted
 class_name Grid
 
-const SIZE := Vector2i(4, 4)
+const DEFAULT_SIZE := Vector2i(4, 4)
 
+var board_size: Vector2i = DEFAULT_SIZE
 var cells: Array = []
 var _next_tile_id: int = 1
 
 func _init() -> void:
 	reset()
 
+func set_size(new_size: Vector2i) -> void:
+	var clamped := Vector2i(max(2, new_size.x), max(2, new_size.y))
+	if clamped == board_size:
+		reset()
+		return
+	board_size = clamped
+	reset()
+
+func get_default_size() -> Vector2i:
+	return DEFAULT_SIZE
+
 func reset() -> void:
 	cells = []
-	for _y in range(SIZE.y):
+	for _y in range(board_size.y):
 		var row: Array = []
-		for _x in range(SIZE.x):
+		for _x in range(board_size.x):
 			row.append(null)
 		cells.append(row)
 	_next_tile_id = 1
@@ -22,7 +34,7 @@ func clear() -> void:
 	reset()
 
 func get_size() -> Vector2i:
-	return SIZE
+	return board_size
 
 func get_cell(position: Vector2i):
 	return cells[position.y][position.x]
@@ -50,8 +62,8 @@ func spawn_tile(position: Vector2i, value: int) -> Dictionary:
 
 func get_empty_cells() -> Array:
 	var empty: Array = []
-	for y in range(SIZE.y):
-		for x in range(SIZE.x):
+	for y in range(board_size.y):
+		for x in range(board_size.x):
 			if cells[y][x] == null:
 				empty.append(Vector2i(x, y))
 	return empty
@@ -59,16 +71,16 @@ func get_empty_cells() -> Array:
 func can_move() -> bool:
 	if get_empty_cells().size() > 0:
 		return true
-	for y in range(SIZE.y):
-		for x in range(SIZE.x):
+	for y in range(board_size.y):
+		for x in range(board_size.x):
 			var current = cells[y][x]
 			if current == null:
 				continue
-			if x < SIZE.x - 1:
+			if x < board_size.x - 1:
 				var right_cell = cells[y][x + 1]
 				if right_cell != null and right_cell["value"] == current["value"]:
 					return true
-			if y < SIZE.y - 1:
+			if y < board_size.y - 1:
 				var down_cell = cells[y + 1][x]
 				if down_cell != null and down_cell["value"] == current["value"]:
 					return true
@@ -76,19 +88,20 @@ func can_move() -> bool:
 
 func get_highest_value() -> int:
 	var highest := 0
-	for y in range(SIZE.y):
-		for x in range(SIZE.x):
+	for y in range(board_size.y):
+		for x in range(board_size.x):
 			var cell = cells[y][x]
 			if cell == null:
 				continue
 			highest = max(highest, int(cell["value"]))
 	return highest
 
-func step(direction: Vector2i) -> Dictionary:
+func step(direction: Vector2i, options: Dictionary = {}) -> Dictionary:
 	var normalized := Vector2i(
 		sign(direction.x),
 		sign(direction.y)
 	)
+	var merge_multiplier := float(options.get("merge_multiplier", 1.0))
 	var result := {
 		"moved": false,
 		"moves": [],
@@ -103,8 +116,8 @@ func step(direction: Vector2i) -> Dictionary:
 
 	_prepare_for_step()
 
-	var x_range := _get_axis_range(SIZE.x, normalized.x)
-	var y_range := _get_axis_range(SIZE.y, normalized.y)
+	var x_range := _get_axis_range(board_size.x, normalized.x)
+	var y_range := _get_axis_range(board_size.y, normalized.y)
 
 	for y in y_range:
 		for x in x_range:
@@ -138,7 +151,10 @@ func step(direction: Vector2i) -> Dictionary:
 			if merge_target != null:
 				var from_id := tile["id"]
 				var into_id := merge_target["id"]
-				merge_target["value"] = int(merge_target["value"]) * 2
+				var base_value := int(merge_target["value"]) * 2
+				if merge_multiplier > 1.0:
+					base_value = int(round(base_value * merge_multiplier))
+				merge_target["value"] = base_value
 				merge_target["merged"] = true
 				result["score"] += merge_target["value"]
 				result["moves"].append({
@@ -171,8 +187,8 @@ func step(direction: Vector2i) -> Dictionary:
 
 func _collect_positions() -> Dictionary:
 	var positions := {}
-	for y in range(SIZE.y):
-		for x in range(SIZE.x):
+	for y in range(board_size.y):
+		for x in range(board_size.x):
 			var tile = cells[y][x]
 			if tile == null:
 				continue
@@ -180,16 +196,16 @@ func _collect_positions() -> Dictionary:
 	return positions
 
 func _prepare_for_step() -> void:
-	for y in range(SIZE.y):
-		for x in range(SIZE.x):
+	for y in range(board_size.y):
+		for x in range(board_size.x):
 			var cell = cells[y][x]
 			if cell == null:
 				continue
 			cell["merged"] = false
 
 func _clear_merge_markers() -> void:
-	for y in range(SIZE.y):
-		for x in range(SIZE.x):
+	for y in range(board_size.y):
+		for x in range(board_size.x):
 			var cell = cells[y][x]
 			if cell == null:
 				continue
@@ -207,5 +223,61 @@ func _get_axis_range(length: int, direction_component: int) -> Array:
 func _is_within_bounds(position: Vector2i) -> bool:
 	return position.x >= 0 \
 		and position.y >= 0 \
-		and position.x < SIZE.x \
-		and position.y < SIZE.y
+		and position.x < board_size.x \
+		and position.y < board_size.y
+
+func serialize_state() -> Dictionary:
+	var state_rows: Array = []
+	for y in range(board_size.y):
+		var row: Array = []
+		for x in range(board_size.x):
+			var cell = cells[y][x]
+			if cell == null:
+				row.append(null)
+			else:
+				row.append({
+					"id": int(cell.get("id", -1)),
+					"value": int(cell.get("value", 2)),
+					"merged": bool(cell.get("merged", false))
+				})
+		state_rows.append(row)
+	return {
+		"size": board_size,
+		"cells": state_rows,
+		"next_id": _next_tile_id
+	}
+
+func apply_state(state: Dictionary) -> void:
+	var target_size := Vector2i(state.get("size", DEFAULT_SIZE))
+	set_size(target_size)
+	var rows: Array = state.get("cells", [])
+	for y in range(board_size.y):
+		for x in range(board_size.x):
+			var cell_data := null
+			if y < rows.size():
+				var row_data = rows[y]
+				if row_data is Array and x < row_data.size():
+					cell_data = row_data[x]
+			if cell_data == null:
+				cells[y][x] = null
+			else:
+				cells[y][x] = {
+					"id": int(cell_data.get("id", -1)),
+					"value": int(cell_data.get("value", 2)),
+					"merged": bool(cell_data.get("merged", false))
+				}
+	_next_tile_id = int(state.get("next_id", 1))
+
+func get_tile_states() -> Array:
+	var tiles: Array = []
+	for y in range(board_size.y):
+		for x in range(board_size.x):
+			var cell = cells[y][x]
+			if cell == null:
+				continue
+			tiles.append({
+				"id": int(cell.get("id", -1)),
+				"value": int(cell.get("value", 2)),
+				"position": Vector2i(x, y)
+			})
+	return tiles

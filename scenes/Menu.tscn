@@ -1,9 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
+[ext_resource type="Script" path="res://scripts/menu_view.gd" id="1"]
 [ext_resource type="Theme" path="res://themes/neobrutalist.theme.tres" id="2"]
-
-[sub_resource type="GDScript" id="1"]
-script/source_code = "extends Control\n\nfunc _ready() -> void:\n\tvar button := $VBoxContainer/StartButton\n\tif not button.pressed.is_connected(_on_start_pressed):\n\t\tbutton.pressed.connect(_on_start_pressed)\n\nfunc _on_start_pressed() -> void:\n\tget_tree().change_scene_to_file(\"res://scenes/Game.tscn\")\n"
 
 [node name="Menu" type="Control"]
 anchors_preset = 15
@@ -11,7 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("1")
+script = ExtResource("1")
 theme = ExtResource("2")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
@@ -27,6 +25,34 @@ theme_override_constants/separation = 24
 text = "Roguelite 2048"
 horizontal_alignment = 1
 
+[node name="CurrencyLabel" type="Label" parent="VBoxContainer"]
+text = "Currency: 0"
+horizontal_alignment = 1
+
+[node name="ModifiersLabel" type="Label" parent="VBoxContainer"]
+text = "Modifiers"
+horizontal_alignment = 1
+
+[node name="ModifiersContainer" type="HBoxContainer" parent="VBoxContainer"]
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="HeavyTilesCheck" type="CheckButton" parent="VBoxContainer/ModifiersContainer"]
+text = "Heavy Tiles"
+size_flags_horizontal = 4
+
+[node name="TinyBoardCheck" type="CheckButton" parent="VBoxContainer/ModifiersContainer"]
+text = "Tiny Board"
+size_flags_horizontal = 4
+
+[node name="SpeedModeCheck" type="CheckButton" parent="VBoxContainer/ModifiersContainer"]
+text = "Speed Mode"
+size_flags_horizontal = 4
+
 [node name="StartButton" type="Button" parent="VBoxContainer"]
 text = "Start Run"
+size_flags_horizontal = 4
+
+[node name="ProgressionButton" type="Button" parent="VBoxContainer"]
+text = "Upgrades & Powerups"
 size_flags_horizontal = 4

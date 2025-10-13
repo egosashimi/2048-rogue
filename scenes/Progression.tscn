@@ -1,9 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Theme" path="res://themes/neobrutalist.theme.tres" id="1"]
-
-[sub_resource type="GDScript" id="1"]
-script/source_code = "extends Control\n"
+[ext_resource type="Script" path="res://scripts/progression_view.gd" id="1"]
+[ext_resource type="Theme" path="res://themes/neobrutalist.theme.tres" id="2"]
 
 [node name="Progression" type="Control"]
 anchors_preset = 15
@@ -11,15 +9,31 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = SubResource("1")
-theme = ExtResource("1")
+script = ExtResource("1")
+theme = ExtResource("2")
 
-[node name="Label" type="Label" parent="."]
-text = "Progression Screen Placeholder"
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+text = "Upgrades & Progression"
 horizontal_alignment = 1
-vertical_alignment = 1
+
+[node name="CurrencyLabel" type="Label" parent="VBoxContainer"]
+text = "Currency: 0"
+horizontal_alignment = 1
+
+[node name="UpgradeList" type="VBoxContainer" parent="VBoxContainer"]
+alignment = 1
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="BackButton" type="Button" parent="VBoxContainer"]
+text = "Back to Menu"
+size_flags_horizontal = 4

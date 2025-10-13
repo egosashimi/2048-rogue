@@ -4,6 +4,12 @@ class_name RunManager
 signal run_initialized(seed: int, modifiers: Array)
 signal run_completed(result: Dictionary)
 
+const ALLOWED_MODIFIERS := [
+	"heavy_tiles",
+	"tiny_board",
+	"speed_mode"
+]
+
 var seed: int = 0
 var modifiers: Array = []
 
@@ -15,15 +21,22 @@ func _init() -> void:
 func start_run(seed_override: int = 0, applied_modifiers: Array = []) -> void:
 	var final_seed := seed_override
 	if final_seed == 0:
-		final_seed = _seed_rng.randi()
+		final_seed = abs(_seed_rng.randi())
 		if final_seed == 0:
 			final_seed = 1
 	seed = final_seed
-	modifiers = applied_modifiers.duplicate(true)
+	modifiers = _filter_modifiers(applied_modifiers)
 	var rng_node := get_node_or_null("/root/RNG")
 	if rng_node != null:
 		rng_node.reseed(seed)
-	run_initialized.emit(seed, modifiers)
+	run_initialized.emit(seed, modifiers.duplicate(true))
 
 func finish_run(result: Dictionary) -> void:
 	run_completed.emit(result)
+
+func _filter_modifiers(applied_modifiers: Array) -> Array:
+	var validated: Array = []
+	for mod in applied_modifiers:
+		if ALLOWED_MODIFIERS.has(mod) and not validated.has(mod):
+			validated.append(mod)
+	return validated

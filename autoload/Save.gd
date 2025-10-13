@@ -32,6 +32,13 @@ func save_game(new_data: Dictionary) -> void:
 	file.close()
 	data = new_data
 
+func set_progression_snapshot(snapshot: Dictionary) -> void:
+	var merged := data.duplicate(true)
+	for key in ["currency", "upgrades"]:
+		if snapshot.has(key):
+			merged[key] = snapshot[key]
+	save_game(merged)
+
 func _default_save() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,

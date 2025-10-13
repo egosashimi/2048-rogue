@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Theme" path="res://themes/neobrutalist.theme.tres" id="2"]
+
+[sub_resource type="GDScript" id="1"]
+script/source_code = "extends Control\n\nfunc _ready() -> void:\n\tvar button := $VBoxContainer/StartButton\n\tif not button.pressed.is_connected(_on_start_pressed):\n\t\tbutton.pressed.connect(_on_start_pressed)\n\nfunc _on_start_pressed() -> void:\n\tget_tree().change_scene_to_file(\"res://scenes/Game.tscn\")\n"
+
+[node name="Menu" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("1")
+theme = ExtResource("2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+text = "Roguelite 2048"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="VBoxContainer"]
+text = "Start Run"
+size_flags_horizontal = 4

@@ -1,0 +1,37 @@
+[gd_resource type="Theme" load_steps=4 format=3]
+
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.070588, 0.070588, 0.070588, 1)
+border_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+
+[sub_resource type="StyleBoxFlat" id="2"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+border_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+
+[sub_resource type="StyleBoxFlat" id="3"]
+bg_color = Color(0.4, 0.4, 0.4, 1)
+border_color = Color(1, 1, 1, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+
+[resource]
+default_font_size = 20
+set_color("font_color", "Label", Color(0.95, 0.95, 0.95, 1))
+set_color("font_color", "Button", Color(0.05, 0.05, 0.05, 1))
+set_color("font_disabled_color", "Button", Color(0.35, 0.35, 0.35, 1))
+set_stylebox("panel", "PanelContainer", SubResource("1"))
+set_stylebox("normal", "Button", SubResource("2"))
+set_stylebox("hover", "Button", SubResource("3"))
+set_stylebox("pressed", "Button", SubResource("1"))
+set_stylebox("disabled", "Button", SubResource("2"))
+set_constant("outline_size", "Button", 2)

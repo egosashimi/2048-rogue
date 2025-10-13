@@ -41,3 +41,6 @@ text = "Score: 0"
 
 [node name="BestLabel" type="Label" parent="HUD/HUDContainer"]
 text = "Best: 0"
+
+[node name="MovesLabel" type="Label" parent="HUD/HUDContainer"]
+text = "Moves: 0"

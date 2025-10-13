@@ -9,6 +9,7 @@ var value: int = 2:
 	set = set_value
 
 var grid_position: Vector2i = Vector2i.ZERO
+var tile_id: int = -1
 
 @onready var value_label: Label = $MarginContainer/Label
 
@@ -23,6 +24,8 @@ func set_value(new_value: int) -> void:
 	value_changed.emit(value)
 
 func set_grid_position(position: Vector2i) -> void:
+	if grid_position == position:
+		return
 	grid_position = position
 	moved.emit(grid_position)
 

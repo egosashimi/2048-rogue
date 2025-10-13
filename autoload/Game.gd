@@ -15,6 +15,8 @@ const INPUT_MAP := {
 }
 
 var input_locked: bool = false
+var last_result: Dictionary = {}
+var current_score: int = 0
 
 func _ready() -> void:
 	_ensure_input_actions()
@@ -24,6 +26,9 @@ func request_move(direction: Vector2i) -> void:
 		return
 	move_requested.emit(direction)
 
+func is_input_locked() -> bool:
+	return input_locked
+
 func set_input_locked(value: bool) -> void:
 	if input_locked == value:
 		return
@@ -31,13 +36,19 @@ func set_input_locked(value: bool) -> void:
 	input_locked_changed.emit(input_locked)
 
 func notify_run_started() -> void:
+	last_result = {}
 	run_started.emit()
 
 func notify_run_ended(result: Dictionary) -> void:
+	last_result = result.duplicate(true)
 	run_ended.emit(result)
 
 func update_score(score: int) -> void:
+	current_score = score
 	score_updated.emit(score)
+
+func get_last_result() -> Dictionary:
+	return last_result.duplicate(true)
 
 func _ensure_input_actions() -> void:
 	for action in INPUT_MAP.keys():

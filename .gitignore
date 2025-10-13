@@ -5,3 +5,5 @@ export/
 *.import
 *.godot/imported/*
 .buildcache/
+.godot/
+nul

@@ -5,3 +5,7 @@ res://autoload/RNG.gd
 res://scripts/game_manager.gd
 res://scripts/grid.gd
 res://scripts/run_manager.gd
+res://scripts/menu_view.gd
+res://scripts/progression_view.gd
+res://scripts/tile.gd
+res://themes/neobrutalist.theme.tres

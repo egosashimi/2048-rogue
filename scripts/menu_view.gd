@@ -29,7 +29,7 @@ func _on_start_pressed() -> void:
 func _on_progression_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/Progression.tscn")
 
-func _on_modifier_toggled(_pressed: bool, key: String) -> void:
+func _on_modifier_toggled(_pressed: bool, _key: String) -> void:
 	var modifiers := _gather_modifiers()
 	var game := _get_game_singleton()
 	if game != null and game.has_method("set_pending_modifiers"):

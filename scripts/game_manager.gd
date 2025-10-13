@@ -127,8 +127,8 @@ func _process(delta: float) -> void:
 	elif board_panel != null and board_panel.position != _board_panel_base_position:
 		board_panel.position = _board_panel_base_position
 
-func _on_run_started(seed: int = 0, modifiers: Array = []) -> void:
-	current_seed = seed
+func _on_run_started(new_seed: int = 0, modifiers: Array = []) -> void:
+	current_seed = new_seed
 	active_modifiers = modifiers.duplicate(true)
 	_update_modifiers_label()
 	_start_new_run()

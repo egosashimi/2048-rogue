@@ -1,6 +1,6 @@
 extends Node
 
-signal run_started(seed: int, modifiers: Array)
+signal run_started(new_seed: int, modifiers: Array)
 signal run_ended(result: Dictionary)
 signal move_requested(direction: Vector2i)
 signal input_locked_changed(locked: bool)
@@ -42,8 +42,8 @@ func set_input_locked(value: bool) -> void:
 	input_locked = value
 	input_locked_changed.emit(input_locked)
 
-func configure_next_seed(seed: int) -> void:
-	_next_seed_override = seed
+func configure_next_seed(new_seed: int) -> void:
+	_next_seed_override = new_seed
 
 func set_pending_modifiers(modifiers: Array) -> void:
 	pending_modifiers = modifiers.duplicate(true)
@@ -104,8 +104,8 @@ func _ensure_run_manager() -> void:
 	if not run_manager.run_completed.is_connected(completed_callable):
 		run_manager.run_completed.connect(completed_callable)
 
-func _on_run_initialized(seed: int, modifiers: Array) -> void:
-	current_seed = seed
+func _on_run_initialized(new_seed: int, modifiers: Array) -> void:
+	current_seed = new_seed
 	active_modifiers = modifiers.duplicate(true)
 	last_result = {}
 	run_started.emit(current_seed, active_modifiers.duplicate(true))

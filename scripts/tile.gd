@@ -74,7 +74,10 @@ func _style_name_for_value(current_value: int) -> StringName:
 	return &"panel_low"
 
 func _font_size_for_value(current_value: int) -> int:
-	for threshold in FONT_SIZES.keys().sorted(reverse=true):
+	var thresholds := FONT_SIZES.keys()
+	thresholds.sort()
+	thresholds.reverse()
+	for threshold in thresholds:
 		if current_value >= threshold:
 			return FONT_SIZES[threshold]
 	return FONT_SIZES[2]

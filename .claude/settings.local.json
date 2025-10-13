@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir scenes)",
+      "Bash(dir:*)",
+      "Bash(godot4:*)",
+      "Bash(where godot)",
+      "Bash(powershell:*)",
+      "Bash(git rm:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

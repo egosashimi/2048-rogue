@@ -9,10 +9,10 @@ const STANDARD_TILE_CHANCE := 0.1
 func _ready() -> void:
 	reseed()
 
-func reseed(seed: int = 0) -> void:
-	if seed == 0:
-		seed = int(Time.get_unix_time_from_system())
-	current_seed = seed
+func reseed(new_seed: int = 0) -> void:
+	if new_seed == 0:
+		new_seed = int(Time.get_unix_time_from_system())
+	current_seed = new_seed
 	generator.seed = current_seed
 	generator.state = generator.seed
 

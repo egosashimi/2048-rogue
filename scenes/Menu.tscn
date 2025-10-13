@@ -12,7 +12,25 @@ grow_vertical = 2
 script = ExtResource("1")
 theme = ExtResource("2")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.047059, 0.047059, 0.058824, 1)
+
+[node name="ContentPanel" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.22
+anchor_top = 0.18
+anchor_right = 0.78
+anchor_bottom = 0.82
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"InfoPanel"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ContentPanel"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -21,38 +39,43 @@ grow_vertical = 2
 alignment = 1
 theme_override_constants/separation = 24
 
-[node name="Title" type="Label" parent="VBoxContainer"]
+[node name="Title" type="Label" parent="ContentPanel/VBoxContainer"]
 text = "Roguelite 2048"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
 
-[node name="CurrencyLabel" type="Label" parent="VBoxContainer"]
+[node name="CurrencyLabel" type="Label" parent="ContentPanel/VBoxContainer"]
 text = "Currency: 0"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
 
-[node name="ModifiersLabel" type="Label" parent="VBoxContainer"]
+[node name="ModifiersLabel" type="Label" parent="ContentPanel/VBoxContainer"]
 text = "Modifiers"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
 
-[node name="ModifiersContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="ModifiersContainer" type="HBoxContainer" parent="ContentPanel/VBoxContainer"]
 alignment = 1
 theme_override_constants/separation = 24
 
-[node name="HeavyTilesCheck" type="CheckButton" parent="VBoxContainer/ModifiersContainer"]
+[node name="HeavyTilesCheck" type="CheckButton" parent="ContentPanel/VBoxContainer/ModifiersContainer"]
 text = "Heavy Tiles"
 size_flags_horizontal = 4
 
-[node name="TinyBoardCheck" type="CheckButton" parent="VBoxContainer/ModifiersContainer"]
+[node name="TinyBoardCheck" type="CheckButton" parent="ContentPanel/VBoxContainer/ModifiersContainer"]
 text = "Tiny Board"
 size_flags_horizontal = 4
 
-[node name="SpeedModeCheck" type="CheckButton" parent="VBoxContainer/ModifiersContainer"]
+[node name="SpeedModeCheck" type="CheckButton" parent="ContentPanel/VBoxContainer/ModifiersContainer"]
 text = "Speed Mode"
 size_flags_horizontal = 4
 
-[node name="StartButton" type="Button" parent="VBoxContainer"]
+[node name="StartButton" type="Button" parent="ContentPanel/VBoxContainer"]
 text = "Start Run"
 size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
 
-[node name="ProgressionButton" type="Button" parent="VBoxContainer"]
+[node name="ProgressionButton" type="Button" parent="ContentPanel/VBoxContainer"]
 text = "Upgrades & Powerups"
 size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 28

@@ -1,1 +1,7 @@
 res://autoload/Save.gd
+res://autoload/Game.gd
+res://autoload/Progression.gd
+res://autoload/RNG.gd
+res://scripts/game_manager.gd
+res://scripts/grid.gd
+res://scripts/run_manager.gd

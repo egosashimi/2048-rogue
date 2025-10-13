@@ -28,14 +28,20 @@ const POWERUP_LABELS := {
 }
 const MERGE_BOOST_MULTIPLIER := 2.0
 const BASE_POWERUP_CHARGES := 1
+const BIG_MERGE_THRESHOLD := 512
+const SHAKE_BASE_DURATION := 0.28
+const SHAKE_MAX_STRENGTH := 24.0
 
-@onready var board_container: Control = $Board
+@onready var board_panel: Control = $BoardPanel
+@onready var board_container: Control = $BoardPanel/Board
 @onready var score_label: Label = $HUD/HUDContainer/ScoreLabel
 @onready var best_label: Label = $HUD/HUDContainer/BestLabel
 @onready var moves_label: Label = $HUD/HUDContainer/MovesLabel
 @onready var currency_label: Label = $HUD/HUDContainer/CurrencyLabel
 @onready var modifiers_label: Label = $HUD/HUDContainer/ModifiersLabel
-@onready var powerups_container: HBoxContainer = $PowerupsBar/Buttons
+@onready var powerups_container: HBoxContainer = $PowerupsPanel/PowerupsBar/Buttons
+@onready var merge_player: AudioStreamPlayer = $Audio/MergePlayer
+@onready var big_merge_player: AudioStreamPlayer = $Audio/BigMergePlayer
 @onready var game_node: Node = get_node("/root/Game")
 @onready var rng_node: Node = get_node("/root/RNG")
 
@@ -62,11 +68,21 @@ var progression_config: Dictionary = {}
 var currency_earned: int = 0
 
 var _cell_size: Vector2 = Vector2.ZERO
+var merge_sound: AudioStreamSample = null
+var big_merge_sound: AudioStreamSample = null
+var _board_panel_base_position: Vector2 = Vector2.ZERO
+var _shake_timer: float = 0.0
+var _shake_duration: float = 0.0
+var _shake_strength: float = 0.0
+var _shake_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _ready() -> void:
 	board_container.clip_contents = true
 	if not board_container.resized.is_connected(_on_board_resized):
 		board_container.resized.connect(_on_board_resized)
+	_shake_rng.randomize()
+	set_process(true)
+	_prepare_audio_streams()
 	await get_tree().process_frame()
 	_update_board_layout()
 	_cache_powerup_buttons()
@@ -94,6 +110,22 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _on_board_resized() -> void:
 	_update_board_layout()
+	if board_panel != null:
+		_board_panel_base_position = board_panel.position
+
+func _process(delta: float) -> void:
+	if _shake_timer > 0.0:
+		_shake_timer = max(_shake_timer - delta, 0.0)
+		var progress := _shake_timer / _shake_duration if _shake_duration > 0.0 else 0.0
+		var intensity := _shake_strength * progress
+		var offset := Vector2(
+			_shake_rng.randf_range(-intensity, intensity),
+			_shake_rng.randf_range(-intensity, intensity)
+		)
+		if board_panel != null:
+			board_panel.position = _board_panel_base_position + offset
+	elif board_panel != null and board_panel.position != _board_panel_base_position:
+		board_panel.position = _board_panel_base_position
 
 func _on_run_started(seed: int = 0, modifiers: Array = []) -> void:
 	current_seed = seed
@@ -190,11 +222,13 @@ func _play_move_animation(result: Dictionary) -> void:
 
 func _on_move_animation_finished(result: Dictionary) -> void:
 	var merges: Array = result.get("merges", [])
+	var max_merge_value := 0
 	for merge_data in merges:
 		var into_id := int(merge_data.get("into_id", -1))
 		if tiles.has(into_id):
 			var into_tile: Tile = tiles[into_id]
 			var new_value := int(merge_data.get("result_value", into_tile.value))
+			max_merge_value = max(max_merge_value, new_value)
 			into_tile.notify_merge(new_value)
 			var final_pos: Vector2i = merge_data.get("position", into_tile.grid_position)
 			into_tile.set_grid_position(final_pos)
@@ -210,6 +244,9 @@ func _on_move_animation_finished(result: Dictionary) -> void:
 			tiles.erase(from_id)
 		if tile_positions.has(from_id):
 			tile_positions.erase(from_id)
+
+	if not merges.is_empty():
+		_handle_merge_feedback(max_merge_value, merges.size())
 
 	var positions: Dictionary = result.get("positions", {})
 	tile_positions.clear()
@@ -301,6 +338,8 @@ func _update_board_layout() -> void:
 	var tile_height := height_available / dims.y if dims.y > 0 else 0.0
 	_cell_size = Vector2(tile_width, tile_height)
 	_reposition_all_tiles()
+	if board_panel != null:
+		_board_panel_base_position = board_panel.position
 
 func _reposition_all_tiles() -> void:
 	for tile_id in tiles.keys():
@@ -640,6 +679,75 @@ func _update_modifiers_label() -> void:
 			_:
 				pretty.append(str(mod).capitalize())
 	modifiers_label.text = "Modifiers: %s" % ", ".join(pretty)
+
+func _handle_merge_feedback(max_value: int, merge_count: int) -> void:
+	_play_merge_sound(max_value)
+	_trigger_screen_shake(max_value, merge_count)
+
+func _play_merge_sound(max_value: int) -> void:
+	if max_value <= 0:
+		return
+	if max_value >= BIG_MERGE_THRESHOLD:
+		if big_merge_player != null and big_merge_sound != null:
+			big_merge_player.pitch_scale = 1.0
+			_play_sample(big_merge_player)
+	else:
+		if merge_player != null and merge_sound != null:
+			var normalized := clamp(float(max_value) / 128.0, 0.0, 1.0)
+			merge_player.pitch_scale = 1.0 + (normalized * 0.35)
+			_play_sample(merge_player)
+
+func _trigger_screen_shake(max_value: int, merge_count: int) -> void:
+	var strength := 0.0
+	if max_value >= 2048:
+		strength = 22.0
+	elif max_value >= 1024:
+		strength = 18.0
+	elif max_value >= 512:
+		strength = 14.0
+	elif max_value >= 256:
+		strength = 9.0
+	else:
+		return
+	strength += float(max(merge_count - 1, 0)) * 1.5
+	_shake_duration = SHAKE_BASE_DURATION
+	_shake_strength = min(strength, SHAKE_MAX_STRENGTH)
+	_shake_timer = _shake_duration
+
+func _prepare_audio_streams() -> void:
+	merge_sound = _build_tone(420.0, 0.16, 0.38)
+	big_merge_sound = _build_tone(180.0, 0.32, 0.6)
+	if merge_player != null and merge_sound != null:
+		merge_player.stream = merge_sound
+		merge_player.volume_db = -3.0
+	if big_merge_player != null and big_merge_sound != null:
+		big_merge_player.stream = big_merge_sound
+		big_merge_player.volume_db = -1.5
+
+func _build_tone(frequency: float, duration: float, amplitude: float) -> AudioStreamSample:
+	var sample := AudioStreamSample.new()
+	sample.format = AudioStreamSample.FORMAT_16_BITS
+	sample.mix_rate = 44100
+	sample.stereo = false
+	var frame_count := int(duration * sample.mix_rate)
+	var data := PackedByteArray()
+	data.resize(max(frame_count * 2, 0))
+	for i in range(frame_count):
+		var t := float(i) / sample.mix_rate
+		var envelope := clamp(1.0 - (t / duration), 0.0, 1.0)
+		var raw := sin(TAU * frequency * t)
+		var value := int(raw * envelope * amplitude * 32767.0)
+		data[i * 2] = value & 0xFF
+		data[i * 2 + 1] = (value >> 8) & 0xFF
+	sample.data = data
+	sample.loop_mode = AudioStreamSample.LOOP_DISABLED
+	return sample
+
+func _play_sample(player: AudioStreamPlayer) -> void:
+	if player == null or player.stream == null:
+		return
+	player.stop()
+	player.play()
 
 func _calculate_currency_reward(reason: String) -> int:
 	var base := int(floor(score / 50.0))

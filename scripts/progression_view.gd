@@ -1,8 +1,8 @@
 extends Control
 
-@onready var currency_label: Label = $VBoxContainer/CurrencyLabel
-@onready var upgrade_list: VBoxContainer = $VBoxContainer/UpgradeList
-@onready var back_button: Button = $VBoxContainer/BackButton
+@onready var currency_label: Label = $ContentPanel/VBoxContainer/CurrencyLabel
+@onready var upgrade_list: VBoxContainer = $ContentPanel/VBoxContainer/UpgradeList
+@onready var back_button: Button = $ContentPanel/VBoxContainer/BackButton
 
 var upgrade_rows: Dictionary = {}
 
@@ -61,9 +61,11 @@ func _build_upgrade_rows() -> void:
 		info_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		info_label.horizontal_alignment = HorizontalAlignment.LEFT
 		info_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+		info_label.add_theme_font_size_override("font_size", 24)
 		var button := Button.new()
 		button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		button.text = "Purchase"
+		button.add_theme_font_size_override("font_size", 22)
 		button.pressed.connect(Callable(self, "_on_upgrade_pressed").bind(key))
 		row.add_child(info_label)
 		row.add_child(button)

@@ -58,7 +58,7 @@ func get_upgrade_cost(key: String) -> int:
 	if not UPGRADE_DEFINITIONS.has(key):
 		return -1
 	var level := get_upgrade_level(key)
-	var def := UPGRADE_DEFINITIONS[key]
+	var def: Dictionary = UPGRADE_DEFINITIONS[key]
 	var max_level := int(def.get("max_level", 1))
 	if level >= max_level:
 		return -1

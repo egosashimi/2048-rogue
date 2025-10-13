@@ -1,11 +1,11 @@
 extends Control
 
-@onready var currency_label: Label = $VBoxContainer/CurrencyLabel
-@onready var start_button: Button = $VBoxContainer/StartButton
-@onready var progression_button: Button = $VBoxContainer/ProgressionButton
-@onready var heavy_tiles_check: CheckButton = $VBoxContainer/ModifiersContainer/HeavyTilesCheck
-@onready var tiny_board_check: CheckButton = $VBoxContainer/ModifiersContainer/TinyBoardCheck
-@onready var speed_mode_check: CheckButton = $VBoxContainer/ModifiersContainer/SpeedModeCheck
+@onready var currency_label: Label = $ContentPanel/VBoxContainer/CurrencyLabel
+@onready var start_button: Button = $ContentPanel/VBoxContainer/StartButton
+@onready var progression_button: Button = $ContentPanel/VBoxContainer/ProgressionButton
+@onready var heavy_tiles_check: CheckButton = $ContentPanel/VBoxContainer/ModifiersContainer/HeavyTilesCheck
+@onready var tiny_board_check: CheckButton = $ContentPanel/VBoxContainer/ModifiersContainer/TinyBoardCheck
+@onready var speed_mode_check: CheckButton = $ContentPanel/VBoxContainer/ModifiersContainer/SpeedModeCheck
 
 func _ready() -> void:
 	if not start_button.pressed.is_connected(_on_start_pressed):

@@ -12,7 +12,15 @@ grow_vertical = 2
 script = ExtResource("1")
 theme = ExtResource("2")
 
-[node name="Board" type="Control" parent="."]
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.047059, 0.047059, 0.058824, 1)
+
+[node name="BoardPanel" type="PanelContainer" parent="."]
 anchors_preset = 8
 anchor_left = 0.1
 anchor_top = 0.15
@@ -20,12 +28,21 @@ anchor_right = 0.9
 anchor_bottom = 0.85
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"InfoPanel"
 
-[node name="HUD" type="Control" parent="."]
+[node name="Board" type="Control" parent="BoardPanel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HUD" type="PanelContainer" parent="."]
 anchors_preset = 3
 anchor_right = 1.0
 grow_horizontal = 2
 custom_minimum_size = Vector2(0, 80)
+theme_type_variation = &"InfoPanel"
 
 [node name="HUDContainer" type="HBoxContainer" parent="HUD"]
 anchors_preset = 15
@@ -38,21 +55,26 @@ theme_override_constants/separation = 24
 
 [node name="ScoreLabel" type="Label" parent="HUD/HUDContainer"]
 text = "Score: 0"
+theme_override_font_sizes/font_size = 26
 
 [node name="BestLabel" type="Label" parent="HUD/HUDContainer"]
 text = "Best: 0"
+theme_override_font_sizes/font_size = 26
 
 [node name="MovesLabel" type="Label" parent="HUD/HUDContainer"]
 text = "Moves: 0"
+theme_override_font_sizes/font_size = 26
 
 [node name="CurrencyLabel" type="Label" parent="HUD/HUDContainer"]
 text = "Currency: 0"
+theme_override_font_sizes/font_size = 26
 
 [node name="ModifiersLabel" type="Label" parent="HUD/HUDContainer"]
 text = "Modifiers: None"
 size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
 
-[node name="PowerupsBar" type="VBoxContainer" parent="."]
+[node name="PowerupsPanel" type="PanelContainer" parent="."]
 anchors_preset = 15
 anchor_left = 0.05
 anchor_top = 0.84
@@ -60,29 +82,50 @@ anchor_right = 0.95
 anchor_bottom = 0.98
 grow_horizontal = 2
 grow_vertical = 2
+theme_type_variation = &"InfoPanel"
+
+[node name="PowerupsBar" type="VBoxContainer" parent="PowerupsPanel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
 theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="PowerupsBar"]
+[node name="Title" type="Label" parent="PowerupsPanel/PowerupsBar"]
 text = "Powerups"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 30
 
-[node name="Buttons" type="HBoxContainer" parent="PowerupsBar"]
+[node name="Buttons" type="HBoxContainer" parent="PowerupsPanel/PowerupsBar"]
 alignment = 1
 theme_override_constants/separation = 12
 
-[node name="UndoButton" type="Button" parent="PowerupsBar/Buttons"]
+[node name="UndoButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
 text = "Undo"
 size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
 
-[node name="ShuffleButton" type="Button" parent="PowerupsBar/Buttons"]
+[node name="ShuffleButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
 text = "Shuffle"
 size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
 
-[node name="ClearLowestButton" type="Button" parent="PowerupsBar/Buttons"]
+[node name="ClearLowestButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
 text = "Clear Lowest"
 size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
 
-[node name="MergeBoostButton" type="Button" parent="PowerupsBar/Buttons"]
+[node name="MergeBoostButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
 text = "Merge Boost"
 size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+
+[node name="Audio" type="Node" parent="."]
+
+[node name="MergePlayer" type="AudioStreamPlayer" parent="Audio"]
+bus = &"Master"
+
+[node name="BigMergePlayer" type="AudioStreamPlayer" parent="Audio"]
+bus = &"Master"

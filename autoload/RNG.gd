@@ -33,7 +33,7 @@ func shuffle_in_place(array: Array) -> void:
 		return
 	for i in range(array.size() - 1, 0, -1):
 		var j := generator.randi_range(0, i)
-		var tmp := array[i]
+		var tmp: Variant = array[i]
 		array[i] = array[j]
 		array[j] = tmp
 

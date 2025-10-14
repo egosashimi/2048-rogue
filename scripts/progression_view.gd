@@ -59,7 +59,7 @@ func _build_upgrade_rows() -> void:
 		row.theme_override_constants.separation = 16
 		var info_label := Label.new()
 		info_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		info_label.horizontal_alignment = HorizontalAlignment.LEFT
+		info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		info_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 		info_label.add_theme_font_size_override("font_size", 24)
 		var button := Button.new()
@@ -86,16 +86,16 @@ func _update_upgrade_row(key: String, progression: Node) -> void:
 	var info_label: Label = refs["label"]
 	var button: Button = refs["button"]
 	var definition: Dictionary = Progression.UPGRADE_DEFINITIONS.get(key, {})
-	var name := definition.get("name", key.capitalize())
-	var description := definition.get("description", "")
+	var name: String = definition.get("name", key.capitalize())
+	var description: String = definition.get("description", "")
 	var max_level := int(definition.get("max_level", 1))
-	var level := progression.get_upgrade_level(key)
+	var level: int = progression.get_upgrade_level(key)
 	var info_lines := []
 	info_lines.append("%s (Lv %d/%d)" % [name, level, max_level])
 	if description != "":
 		info_lines.append(description)
 	info_label.text = "\n".join(info_lines)
-	var cost := progression.get_upgrade_cost(key)
+	var cost: int = progression.get_upgrade_cost(key)
 	if cost < 0:
 		button.text = "Maxed"
 		button.disabled = true

@@ -68,8 +68,8 @@ var progression_config: Dictionary = {}
 var currency_earned: int = 0
 
 var _cell_size: Vector2 = Vector2.ZERO
-var merge_sound: AudioStreamSample = null
-var big_merge_sound: AudioStreamSample = null
+var merge_sound: AudioStreamWAV = null
+var big_merge_sound: AudioStreamWAV = null
 var _board_panel_base_position: Vector2 = Vector2.ZERO
 var _shake_timer: float = 0.0
 var _shake_duration: float = 0.0
@@ -83,7 +83,7 @@ func _ready() -> void:
 	_shake_rng.randomize()
 	set_process(true)
 	_prepare_audio_streams()
-	await get_tree().process_frame()
+	await get_tree().process_frame
 	_update_board_layout()
 	_cache_powerup_buttons()
 
@@ -290,9 +290,9 @@ func _spawn_random_tile(value_override: int = 0) -> Dictionary:
 	var empty := grid.get_empty_cells()
 	if empty.is_empty():
 		return {}
-	var index := rng_node.randi_range(0, empty.size() - 1)
+	var index: int = rng_node.randi_range(0, empty.size() - 1)
 	var grid_pos: Vector2i = empty[index]
-	var value := value_override if value_override > 0 else rng_node.pick_random_tile_value(heavy_tiles_enabled)
+	var value: int = value_override if value_override > 0 else rng_node.pick_random_tile_value(heavy_tiles_enabled)
 	var state := grid.spawn_tile(grid_pos, value)
 	if state.is_empty():
 		return {}
@@ -332,10 +332,10 @@ func _grid_to_pixel(grid_pos: Vector2i) -> Vector2:
 func _update_board_layout() -> void:
 	var size := board_container.size
 	var dims := grid.get_size() if grid != null else Grid.DEFAULT_SIZE
-	var width_available := max(size.x - (BOARD_PADDING * 2.0) - (dims.x - 1) * CELL_GAP, 0.0)
-	var height_available := max(size.y - (BOARD_PADDING * 2.0) - (dims.y - 1) * CELL_GAP, 0.0)
-	var tile_width := width_available / dims.x if dims.x > 0 else 0.0
-	var tile_height := height_available / dims.y if dims.y > 0 else 0.0
+	var width_available: float = max(size.x - (BOARD_PADDING * 2.0) - (dims.x - 1) * CELL_GAP, 0.0)
+	var height_available: float = max(size.y - (BOARD_PADDING * 2.0) - (dims.y - 1) * CELL_GAP, 0.0)
+	var tile_width: float = width_available / dims.x if dims.x > 0 else 0.0
+	var tile_height: float = height_available / dims.y if dims.y > 0 else 0.0
 	_cell_size = Vector2(tile_width, tile_height)
 	_reposition_all_tiles()
 	if board_panel != null:
@@ -656,7 +656,7 @@ func _clear_lowest_tile() -> bool:
 		index = rng_node.randi_range(0, candidates.size() - 1)
 	else:
 		index = randi() % candidates.size()
-	var target := candidates[index]
+	var target: Dictionary = candidates[index]
 	var pos: Vector2i = target.get("position", Vector2i.ZERO)
 	grid.set_cell(pos, null)
 	return true
@@ -693,7 +693,7 @@ func _play_merge_sound(max_value: int) -> void:
 			_play_sample(big_merge_player)
 	else:
 		if merge_player != null and merge_sound != null:
-			var normalized := clamp(float(max_value) / 128.0, 0.0, 1.0)
+			var normalized: float = clamp(float(max_value) / 128.0, 0.0, 1.0)
 			merge_player.pitch_scale = 1.0 + (normalized * 0.35)
 			_play_sample(merge_player)
 
@@ -724,23 +724,23 @@ func _prepare_audio_streams() -> void:
 		big_merge_player.stream = big_merge_sound
 		big_merge_player.volume_db = -1.5
 
-func _build_tone(frequency: float, duration: float, amplitude: float) -> AudioStreamSample:
-	var sample := AudioStreamSample.new()
-	sample.format = AudioStreamSample.FORMAT_16_BITS
+func _build_tone(frequency: float, duration: float, amplitude: float) -> AudioStreamWAV:
+	var sample := AudioStreamWAV.new()
+	sample.format = AudioStreamWAV.FORMAT_16_BITS
 	sample.mix_rate = 44100
 	sample.stereo = false
 	var frame_count := int(duration * sample.mix_rate)
 	var data := PackedByteArray()
 	data.resize(max(frame_count * 2, 0))
 	for i in range(frame_count):
-		var t := float(i) / sample.mix_rate
+		var t: float = float(i) / sample.mix_rate
 		var envelope := clamp(1.0 - (t / duration), 0.0, 1.0)
 		var raw := sin(TAU * frequency * t)
 		var value := int(raw * envelope * amplitude * 32767.0)
 		data[i * 2] = value & 0xFF
 		data[i * 2 + 1] = (value >> 8) & 0xFF
 	sample.data = data
-	sample.loop_mode = AudioStreamSample.LOOP_DISABLED
+	sample.loop_mode = AudioStreamWAV.LOOP_DISABLED
 	return sample
 
 func _play_sample(player: AudioStreamPlayer) -> void:

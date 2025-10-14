@@ -1,0 +1,36 @@
+Godot Engine v4.5.stable.official (c) 2007-present Juan Linietsky, Ariel Manzur & Godot Contributors.
+  ERROR: Couldn't find the given section "preset.0" and key "include_filter", and no default was given.
+  ERROR: Couldn't find the given section "preset.0" and key "exclude_filter", and no default was given.
+  ERROR: Couldn't find the given section "preset.1" and key "include_filter", and no default was given.
+  ERROR: Couldn't find the given section "preset.1" and key "exclude_filter", and no default was given.
+--- Debug adapter server started on port 6006 ---
+  ERROR: Couldn't find the given section "preset.0" and key "include_filter", and no default was given.
+  ERROR: Couldn't find the given section "preset.0" and key "exclude_filter", and no default was given.
+  ERROR: Couldn't find the given section "preset.1" and key "include_filter", and no default was given.
+  ERROR: Couldn't find the given section "preset.1" and key "exclude_filter", and no default was given.
+  ERROR: res://scripts/game_manager.gd:71 - Parse Error: Could not find type "AudioStreamSample" in the current scope.
+  ERROR: res://scripts/game_manager.gd:72 - Parse Error: Could not find type "AudioStreamSample" in the current scope.
+  ERROR: res://scripts/game_manager.gd:727 - Parse Error: Could not find type "AudioStreamSample" in the current scope.
+  ERROR: res://scripts/game_manager.gd:86 - Parse Error: Name "process_frame" called as a function but is a "Signal".
+  ERROR: res://scripts/game_manager.gd:293 - Parse Error: Cannot infer the type of "index" variable because the value doesn't have a set type.
+  ERROR: res://scripts/game_manager.gd:295 - Parse Error: Cannot infer the type of "value" variable because the value doesn't have a set type.
+  ERROR: res://scripts/game_manager.gd:337 - Parse Error: Cannot infer the type of "tile_width" variable because the value doesn't have a set type.
+  ERROR: res://scripts/game_manager.gd:338 - Parse Error: Cannot infer the type of "tile_height" variable because the value doesn't have a set type.
+  ERROR: res://scripts/game_manager.gd:659 - Parse Error: Cannot infer the type of "target" variable because the value doesn't have a set type.
+  ERROR: res://scripts/game_manager.gd:728 - Parse Error: Identifier "AudioStreamSample" not declared in the current scope. Did you mean to use "AudioStreamWAV"?
+  ERROR: res://scripts/game_manager.gd:728 - Parse Error: Cannot infer the type of "sample" variable because the value doesn't have a set type.
+  ERROR: res://scripts/game_manager.gd:729 - Parse Error: Identifier "AudioStreamSample" not declared in the current scope. Did you mean to use "AudioStreamWAV"?
+  ERROR: res://scripts/game_manager.gd:736 - Parse Error: Cannot infer the type of "t" variable because the value doesn't have a set type.
+  ERROR: res://scripts/game_manager.gd:743 - Parse Error: Identifier "AudioStreamSample" not declared in the current scope. Did you mean to use "AudioStreamWAV"?
+  ERROR: res://scripts/game_manager.gd:335 - Parse Error: The variable type is being inferred from a Variant value, so it will be typed as Variant. (Warning treated as error.)
+  ERROR: res://scripts/game_manager.gd:336 - Parse Error: The variable type is being inferred from a Variant value, so it will be typed as Variant. (Warning treated as error.)
+  ERROR: res://scripts/game_manager.gd:696 - Parse Error: The variable type is being inferred from a Variant value, so it will be typed as Variant. (Warning treated as error.)
+  ERROR: res://scripts/game_manager.gd:737 - Parse Error: The variable type is being inferred from a Variant value, so it will be typed as Variant. (Warning treated as error.)
+  ERROR: modules/gdscript/gdscript.cpp:3041 - Failed to load script "res://scripts/game_manager.gd" with error "Parse error".
+  ERROR: res://scripts/progression_view.gd:62 - Parse Error: Cannot find member "LEFT" in base "HorizontalAlignment".
+  ERROR: res://scripts/progression_view.gd:92 - Parse Error: Cannot infer the type of "level" variable because the value doesn't have a set type.
+  ERROR: res://scripts/progression_view.gd:98 - Parse Error: Cannot infer the type of "cost" variable because the value doesn't have a set type.
+  ERROR: res://scripts/progression_view.gd:89 - Parse Error: The variable type is being inferred from a Variant value, so it will be typed as Variant. (Warning treated as error.)
+  ERROR: res://scripts/progression_view.gd:90 - Parse Error: The variable type is being inferred from a Variant value, so it will be typed as Variant. (Warning treated as error.)
+  ERROR: modules/gdscript/gdscript.cpp:3041 - Failed to load script "res://scripts/progression_view.gd" with error "Parse error".
+--- GDScript language server started on port 6005 ---

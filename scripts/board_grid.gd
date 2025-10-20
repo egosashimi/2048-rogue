@@ -12,7 +12,8 @@ const CELL_GAP := 12.0
 var _cell_size: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
-	z_index = -1  # Draw behind tiles
+	# Don't set z_index here - tiles are children of this control
+	# The grid will be drawn in _draw() which happens before children render
 	queue_redraw()
 
 func _draw() -> void:

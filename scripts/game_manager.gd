@@ -301,6 +301,7 @@ func _spawn_random_tile(value_override: int = 0) -> Dictionary:
 	tile.tile_id = state["id"]
 	tile.set_value(value)
 	tile.set_grid_position(grid_pos)
+	tile.z_index = 1  # Ensure tiles render above grid
 	board_container.add_child(tile)
 	tiles[tile.tile_id] = tile
 	tile_positions[tile.tile_id] = grid_pos
@@ -733,7 +734,7 @@ func _build_tone(frequency: float, duration: float, amplitude: float) -> AudioSt
 	var data := PackedByteArray()
 	data.resize(max(frame_count * 2, 0))
 	for i in range(frame_count):
-		var t: float = float(i) / sample.mix_rate
+		var t: float = float(i) / float(sample.mix_rate)
 		var envelope: float = clamp(1.0 - (t / duration), 0.0, 1.0)
 		var raw: float = sin(TAU * frequency * t)
 		var value: int = int(raw * envelope * amplitude * 32767.0)

@@ -8,7 +8,15 @@
       "Bash(powershell:*)",
       "Bash(git rm:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(tee:*)",
+      "Bash(powershell.exe -c \"where.exe godot\")",
+      "Bash(where:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(\"C:\\Users\\Admin\\Downloads\\Godot_v4.5-stable_win64.exe\\Godot_v4.5-stable_win64_console.exe\" --path \"C:\\Users\\Admin\\Desktop\\2048-rogue\" --headless --quit)",
+      "Bash(\"C:\\Users\\Admin\\Downloads\\Godot_v4.5-stable_win64.exe\\Godot_v4.5-stable_win64_console.exe\" --path \"C:\\Users\\Admin\\Desktop\\2048-rogue\" --verbose)",
+      "Bash(timeout /t 5)",
+      "Bash(\"C:\\Users\\Admin\\Downloads\\Godot_v4.5-stable_win64.exe\\Godot_v4.5-stable_win64_console.exe\" --path \"C:\\Users\\Admin\\Desktop\\2048-rogue\")"
     ],
     "deny": [],
     "ask": []

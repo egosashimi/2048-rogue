@@ -32,14 +32,14 @@ const BIG_MERGE_THRESHOLD := 512
 const SHAKE_BASE_DURATION := 0.28
 const SHAKE_MAX_STRENGTH := 24.0
 
-@onready var board_panel: Control = $BoardPanel
-@onready var board_container: Control = $BoardPanel/Board
-@onready var score_label: Label = $HUD/HUDContainer/ScoreLabel
-@onready var best_label: Label = $HUD/HUDContainer/BestLabel
-@onready var moves_label: Label = $HUD/HUDContainer/MovesLabel
-@onready var currency_label: Label = $HUD/HUDContainer/CurrencyLabel
-@onready var modifiers_label: Label = $HUD/HUDContainer/ModifiersLabel
-@onready var powerups_container: HBoxContainer = $PowerupsPanel/PowerupsBar/Buttons
+@onready var board_panel: Control = $MainLayout/CenterContainer/BoardPanel
+@onready var board_container: Control = $MainLayout/CenterContainer/BoardPanel/Board
+@onready var score_label: Label = $MainLayout/RightSidebar/HUD/HUDContainer/ScoreLabel
+@onready var best_label: Label = $MainLayout/RightSidebar/HUD/HUDContainer/BestLabel
+@onready var moves_label: Label = $MainLayout/RightSidebar/HUD/HUDContainer/MovesLabel
+@onready var currency_label: Label = $MainLayout/RightSidebar/HUD/HUDContainer/CurrencyLabel
+@onready var modifiers_label: Label = $MainLayout/RightSidebar/HUD/HUDContainer/ModifiersLabel
+@onready var powerups_container: VBoxContainer = $MainLayout/RightSidebar/PowerupsPanel/PowerupsBar
 @onready var merge_player: AudioStreamPlayer = $Audio/MergePlayer
 @onready var big_merge_player: AudioStreamPlayer = $Audio/BigMergePlayer
 @onready var game_node: Node = get_node("/root/Game")
@@ -734,9 +734,9 @@ func _build_tone(frequency: float, duration: float, amplitude: float) -> AudioSt
 	data.resize(max(frame_count * 2, 0))
 	for i in range(frame_count):
 		var t: float = float(i) / sample.mix_rate
-		var envelope := clamp(1.0 - (t / duration), 0.0, 1.0)
-		var raw := sin(TAU * frequency * t)
-		var value := int(raw * envelope * amplitude * 32767.0)
+		var envelope: float = clamp(1.0 - (t / duration), 0.0, 1.0)
+		var raw: float = sin(TAU * frequency * t)
+		var value: int = int(raw * envelope * amplitude * 32767.0)
 		data[i * 2] = value & 0xFF
 		data[i * 2 + 1] = (value >> 8) & 0xFF
 	sample.data = data

@@ -122,7 +122,7 @@ func step(direction: Vector2i, options: Dictionary = {}) -> Dictionary:
 	for y in y_range:
 		for x in x_range:
 			var start := Vector2i(x, y)
-			var tile := get_cell(start)
+			var tile: Variant = get_cell(start)
 			if tile == null:
 				continue
 
@@ -133,7 +133,7 @@ func step(direction: Vector2i, options: Dictionary = {}) -> Dictionary:
 				target = next
 				next += normalized
 
-			var merge_target := null
+			var merge_target: Variant = null
 			if _is_within_bounds(next):
 				var next_tile = get_cell(next)
 				if next_tile != null \
@@ -149,8 +149,8 @@ func step(direction: Vector2i, options: Dictionary = {}) -> Dictionary:
 			set_cell(start, null)
 
 			if merge_target != null:
-				var from_id := tile["id"]
-				var into_id := merge_target["id"]
+				var from_id: int = tile["id"]
+				var into_id: int = merge_target["id"]
 				var base_value := int(merge_target["value"]) * 2
 				if merge_multiplier > 1.0:
 					base_value = int(round(base_value * merge_multiplier))
@@ -253,7 +253,7 @@ func apply_state(state: Dictionary) -> void:
 	var rows: Array = state.get("cells", [])
 	for y in range(board_size.y):
 		for x in range(board_size.x):
-			var cell_data := null
+			var cell_data: Variant = null
 			if y < rows.size():
 				var row_data = rows[y]
 				if row_data is Array and x < row_data.size():

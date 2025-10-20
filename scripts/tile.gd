@@ -51,27 +51,55 @@ func _update_label() -> void:
 	if value_label == null:
 		return
 	value_label.text = str(value)
+
+	# Ensure tile is fully opaque
+	modulate = Color(1, 1, 1, 1)
+
 	var theme := get_theme()
 	if theme != null:
 		var style_name := _style_name_for_value(value)
 		var stylebox := theme.get_stylebox(style_name, "Tile")
 		if stylebox != null:
 			add_theme_stylebox_override("panel", stylebox)
-		var use_dark_font := value >= 128
+
+		# Use dark font for bright backgrounds (yellow, lime, cyan, coral, mint)
+		# Use white font for darker/saturated backgrounds (pink, purple, orange, black)
+		var use_dark_font := value in [2, 8, 16, 128, 512]
 		var color_name := "fg_dark" if use_dark_font else "fg_light"
 		var font_color := theme.get_color(color_name, "Tile")
 		value_label.add_theme_color_override("font_color", font_color)
+
 	var target_size := _font_size_for_value(value)
 	value_label.add_theme_font_size_override("font_size", target_size)
 
 func _style_name_for_value(current_value: int) -> StringName:
-	if current_value >= 1024:
-		return &"panel_max"
-	if current_value >= 256:
-		return &"panel_high"
-	if current_value >= 8:
-		return &"panel_mid"
-	return &"panel_low"
+	# Map specific values to their unique color panels
+	match current_value:
+		2:
+			return &"panel_2"
+		4:
+			return &"panel_4"
+		8:
+			return &"panel_8"
+		16:
+			return &"panel_16"
+		32:
+			return &"panel_32"
+		64:
+			return &"panel_64"
+		128:
+			return &"panel_128"
+		256:
+			return &"panel_256"
+		512:
+			return &"panel_512"
+		1024:
+			return &"panel_1024"
+		2048:
+			return &"panel_2048"
+		_:
+			# For 4096+ cycle through vibrant colors
+			return &"panel_2048"
 
 func _font_size_for_value(current_value: int) -> int:
 	var thresholds := FONT_SIZES.keys()

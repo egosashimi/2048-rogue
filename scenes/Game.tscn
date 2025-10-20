@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="1"]
 [ext_resource type="Theme" path="res://themes/neobrutalist.theme.tres" id="2"]
+[ext_resource type="Script" path="res://scripts/grid_background.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/board_grid.gd" id="4"]
 
 [node name="Game" type="Control"]
 anchors_preset = 15
@@ -18,109 +20,142 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.047059, 0.047059, 0.058824, 1)
+color = Color(1, 0.078, 0.576, 1)
+script = ExtResource("3")
+grid_size = 40
+grid_color = Color(0, 0, 0, 0.15)
+grid_thickness = 3
 
-[node name="BoardPanel" type="PanelContainer" parent="."]
-anchors_preset = 8
-anchor_left = 0.1
-anchor_top = 0.15
-anchor_right = 0.9
-anchor_bottom = 0.85
-grow_horizontal = 2
-grow_vertical = 2
-theme_type_variation = &"InfoPanel"
-
-[node name="Board" type="Control" parent="BoardPanel"]
+[node name="MainLayout" type="HBoxContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 0
 
-[node name="HUD" type="PanelContainer" parent="."]
-anchors_preset = 3
-anchor_right = 1.0
-grow_horizontal = 2
-custom_minimum_size = Vector2(0, 80)
+[node name="LeftSpacer" type="Control" parent="MainLayout"]
+custom_minimum_size = Vector2(30, 0)
+size_flags_horizontal = 0
+
+[node name="CenterContainer" type="VBoxContainer" parent="MainLayout"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="TopSpacer" type="Control" parent="MainLayout/CenterContainer"]
+custom_minimum_size = Vector2(0, 20)
+size_flags_vertical = 0
+
+[node name="BoardPanel" type="PanelContainer" parent="MainLayout/CenterContainer"]
+custom_minimum_size = Vector2(600, 600)
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_type_variation = &"InfoPanel"
 
-[node name="HUDContainer" type="HBoxContainer" parent="HUD"]
+[node name="Board" type="Control" parent="MainLayout/CenterContainer/BoardPanel"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-alignment = 1
-theme_override_constants/separation = 24
+script = ExtResource("4")
+grid_size = 4
+cell_color = Color(0.2, 0.2, 0.25, 1)
+cell_border_color = Color(0, 0, 0, 1)
+cell_border_width = 8
 
-[node name="ScoreLabel" type="Label" parent="HUD/HUDContainer"]
+[node name="BottomSpacer" type="Control" parent="MainLayout/CenterContainer"]
+custom_minimum_size = Vector2(0, 20)
+size_flags_vertical = 0
+
+[node name="RightSidebar" type="VBoxContainer" parent="MainLayout"]
+custom_minimum_size = Vector2(350, 0)
+size_flags_horizontal = 0
+theme_override_constants/separation = 20
+
+[node name="TopSpacer2" type="Control" parent="MainLayout/RightSidebar"]
+custom_minimum_size = Vector2(0, 20)
+size_flags_vertical = 0
+
+[node name="HUD" type="PanelContainer" parent="MainLayout/RightSidebar"]
+custom_minimum_size = Vector2(0, 250)
+size_flags_horizontal = 3
+theme_type_variation = &"InfoPanel"
+
+[node name="HUDContainer" type="VBoxContainer" parent="MainLayout/RightSidebar/HUD"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="MainLayout/RightSidebar/HUD/HUDContainer"]
+text = "STATS"
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 36
+
+[node name="ScoreLabel" type="Label" parent="MainLayout/RightSidebar/HUD/HUDContainer"]
 text = "Score: 0"
-theme_override_font_sizes/font_size = 26
-
-[node name="BestLabel" type="Label" parent="HUD/HUDContainer"]
-text = "Best: 0"
-theme_override_font_sizes/font_size = 26
-
-[node name="MovesLabel" type="Label" parent="HUD/HUDContainer"]
-text = "Moves: 0"
-theme_override_font_sizes/font_size = 26
-
-[node name="CurrencyLabel" type="Label" parent="HUD/HUDContainer"]
-text = "Currency: 0"
-theme_override_font_sizes/font_size = 26
-
-[node name="ModifiersLabel" type="Label" parent="HUD/HUDContainer"]
-text = "Modifiers: None"
-size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
 
-[node name="PowerupsPanel" type="PanelContainer" parent="."]
-anchors_preset = 15
-anchor_left = 0.05
-anchor_top = 0.84
-anchor_right = 0.95
-anchor_bottom = 0.98
-grow_horizontal = 2
-grow_vertical = 2
+[node name="BestLabel" type="Label" parent="MainLayout/RightSidebar/HUD/HUDContainer"]
+text = "Best: 0"
+theme_override_font_sizes/font_size = 24
+
+[node name="MovesLabel" type="Label" parent="MainLayout/RightSidebar/HUD/HUDContainer"]
+text = "Moves: 0"
+theme_override_font_sizes/font_size = 24
+
+[node name="CurrencyLabel" type="Label" parent="MainLayout/RightSidebar/HUD/HUDContainer"]
+text = "Currency: 0"
+theme_override_font_sizes/font_size = 24
+
+[node name="ModifiersLabel" type="Label" parent="MainLayout/RightSidebar/HUD/HUDContainer"]
+text = "Modifiers: None"
+theme_override_font_sizes/font_size = 20
+autowrap_mode = 3
+
+[node name="PowerupsPanel" type="PanelContainer" parent="MainLayout/RightSidebar"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_type_variation = &"InfoPanel"
 
-[node name="PowerupsBar" type="VBoxContainer" parent="PowerupsPanel"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-theme_override_constants/separation = 12
+[node name="PowerupsBar" type="VBoxContainer" parent="MainLayout/RightSidebar/PowerupsPanel"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="PowerupsPanel/PowerupsBar"]
-text = "Powerups"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 30
+[node name="Title" type="Label" parent="MainLayout/RightSidebar/PowerupsPanel/PowerupsBar"]
+text = "POWERUPS"
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 36
 
-[node name="Buttons" type="HBoxContainer" parent="PowerupsPanel/PowerupsBar"]
-alignment = 1
-theme_override_constants/separation = 12
-
-[node name="UndoButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
-text = "Undo"
-size_flags_horizontal = 4
+[node name="UndoButton" type="Button" parent="MainLayout/RightSidebar/PowerupsPanel/PowerupsBar"]
+text = "UNDO"
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 
-[node name="ShuffleButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
-text = "Shuffle"
-size_flags_horizontal = 4
+[node name="ShuffleButton" type="Button" parent="MainLayout/RightSidebar/PowerupsPanel/PowerupsBar"]
+text = "SHUFFLE"
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 
-[node name="ClearLowestButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
-text = "Clear Lowest"
-size_flags_horizontal = 4
+[node name="ClearLowestButton" type="Button" parent="MainLayout/RightSidebar/PowerupsPanel/PowerupsBar"]
+text = "CLEAR LOWEST"
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 
-[node name="MergeBoostButton" type="Button" parent="PowerupsPanel/PowerupsBar/Buttons"]
-text = "Merge Boost"
-size_flags_horizontal = 4
+[node name="MergeBoostButton" type="Button" parent="MainLayout/RightSidebar/PowerupsPanel/PowerupsBar"]
+text = "MERGE BOOST"
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
+
+[node name="BottomSpacer2" type="Control" parent="MainLayout/RightSidebar"]
+custom_minimum_size = Vector2(0, 20)
+size_flags_vertical = 0
+
+[node name="RightSpacer" type="Control" parent="MainLayout"]
+custom_minimum_size = Vector2(30, 0)
+size_flags_horizontal = 0
 
 [node name="Audio" type="Node" parent="."]
 

@@ -1,1 +1,4 @@
-/bin/bash: line 1: godot4: command not found
+Godot Engine v4.5.stable.official.876b29033 - https://godotengine.org
+Vulkan 1.4.312 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 3090
+
+Main scene loaded, transitioning to Menu...

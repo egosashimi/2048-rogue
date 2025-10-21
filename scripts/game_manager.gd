@@ -726,12 +726,12 @@ func _prepare_audio_streams() -> void:
 		big_merge_player.volume_db = -1.5
 
 func _build_tone(frequency: float, duration: float, amplitude: float) -> AudioStreamWAV:
-	var sample := AudioStreamWAV.new()
+	var sample: AudioStreamWAV = AudioStreamWAV.new()
 	sample.format = AudioStreamWAV.FORMAT_16_BITS
 	sample.mix_rate = 44100
 	sample.stereo = false
-	var frame_count := int(duration * sample.mix_rate)
-	var data := PackedByteArray()
+	var frame_count: int = int(duration * sample.mix_rate)
+	var data: PackedByteArray = PackedByteArray()
 	data.resize(max(frame_count * 2, 0))
 	for i in range(frame_count):
 		var t: float = float(i) / float(sample.mix_rate)

@@ -8,19 +8,43 @@ const UPGRADE_DEFINITIONS := {
 		"name": "Starter Tile",
 		"description": "Begin each run with an extra tile valued at 4.",
 		"base_cost": 200,
-		"max_level": 1
+		"max_level": 3  # Increased from 1
 	},
 	"powerup_capacity": {
 		"name": "Power Reserves",
 		"description": "Gain +1 charge for every powerup each run.",
 		"base_cost": 250,
-		"max_level": 2
+		"max_level": 5  # Increased from 2
 	},
 	"score_multiplier": {
 		"name": "Score Multiplier",
 		"description": "Earn +10% currency at the end of each run.",
 		"base_cost": 300,
+		"max_level": 5  # Increased from 3
+	},
+	"lucky_spawns": {
+		"name": "Lucky Spawns",
+		"description": "5% chance for spawned tiles to be double value.",
+		"base_cost": 350,
 		"max_level": 3
+	},
+	"combo_master": {
+		"name": "Combo Master",
+		"description": "+5% score for merges (stacks with Combo Chain modifier).",
+		"base_cost": 400,
+		"max_level": 4
+	},
+	"starting_score": {
+		"name": "Head Start",
+		"description": "Begin each run with +500 score.",
+		"base_cost": 150,
+		"max_level": 5
+	},
+	"resilience": {
+		"name": "Resilience",
+		"description": "One free undo per run (doesn't consume charges).",
+		"base_cost": 500,
+		"max_level": 1
 	}
 }
 
@@ -90,10 +114,18 @@ func get_run_config() -> Dictionary:
 	var powerup_bonus := get_upgrade_level("powerup_capacity")
 	var starter_tile_count := get_upgrade_level("starter_tile")
 	var score_multiplier := 1.0 + (0.1 * get_upgrade_level("score_multiplier"))
+	var lucky_spawn_chance := get_upgrade_level("lucky_spawns") * 0.05  # 5% per level
+	var combo_bonus := get_upgrade_level("combo_master") * 0.05  # 5% per level
+	var starting_score := get_upgrade_level("starting_score") * 500
+	var free_undo := get_upgrade_level("resilience") > 0
 	return {
 		"powerup_bonus": powerup_bonus,
 		"starter_tile_count": starter_tile_count,
-		"score_multiplier": score_multiplier
+		"score_multiplier": score_multiplier,
+		"lucky_spawn_chance": lucky_spawn_chance,
+		"combo_bonus": combo_bonus,
+		"starting_score": starting_score,
+		"free_undo": free_undo
 	}
 
 func _emit_snapshot_changed() -> void:

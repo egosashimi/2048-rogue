@@ -18,13 +18,19 @@ const POWERUP_KEYS := [
 	"undo",
 	"shuffle",
 	"clear_lowest",
-	"merge_boost"
+	"merge_boost",
+	"duplicate",
+	"nuke",
+	"rewind3"
 ]
 const POWERUP_LABELS := {
 	"undo": "Undo",
 	"shuffle": "Shuffle",
 	"clear_lowest": "Clear Lowest",
-	"merge_boost": "Merge Boost"
+	"merge_boost": "Merge Boost",
+	"duplicate": "Duplicate",
+	"nuke": "Nuke",
+	"rewind3": "Rewind x3"
 }
 const MERGE_BOOST_MULTIPLIER := 2.0
 const BASE_POWERUP_CHARGES := 1
@@ -63,11 +69,22 @@ var undo_snapshot: Dictionary = {}
 var heavy_tiles_enabled: bool = false
 var tiny_board_enabled: bool = false
 var speed_mode_enabled: bool = false
+var reverse_controls_enabled: bool = false
+var gravity_shift_enabled: bool = false
+var chaos_mode_enabled: bool = false
+var time_pressure_enabled: bool = false
+var mega_tiles_enabled: bool = false
+var no_twos_enabled: bool = false
+var combo_chain_enabled: bool = false
+var cursed_tile_enabled: bool = false
 var last_rng_state: int = 0
 var progression_config: Dictionary = {}
 var currency_earned: int = 0
+var has_won: bool = false
+var continue_after_win: bool = false
 
 var _cell_size: Vector2 = Vector2.ZERO
+var _win_dialog: ConfirmationDialog = null
 var merge_sound: AudioStreamWAV = null
 var big_merge_sound: AudioStreamWAV = null
 var _board_panel_base_position: Vector2 = Vector2.ZERO
@@ -75,6 +92,8 @@ var _shake_timer: float = 0.0
 var _shake_duration: float = 0.0
 var _shake_strength: float = 0.0
 var _shake_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _time_pressure_timer: float = 0.0
+var _time_pressure_duration: float = 5.0  # 5 seconds per move
 
 func _ready() -> void:
 	board_container.clip_contents = true
@@ -83,6 +102,7 @@ func _ready() -> void:
 	_shake_rng.randomize()
 	set_process(true)
 	_prepare_audio_streams()
+	_create_win_dialog()
 	await get_tree().process_frame
 	_update_board_layout()
 	_cache_powerup_buttons()
@@ -99,6 +119,27 @@ func _connect_game_signals() -> void:
 	if not game_node.run_started.is_connected(_on_run_started):
 		game_node.run_started.connect(_on_run_started)
 
+func _create_win_dialog() -> void:
+	_win_dialog = ConfirmationDialog.new()
+	_win_dialog.title = "Victory!"
+	_win_dialog.dialog_text = "You reached 2048! 🎉\n\nContinue playing to reach higher tiles and earn bonus currency, or end your run now."
+	_win_dialog.ok_button_text = "Continue Playing"
+	_win_dialog.cancel_button_text = "End Run"
+	_win_dialog.confirmed.connect(_on_win_continue)
+	_win_dialog.canceled.connect(_on_win_end_run)
+	add_child(_win_dialog)
+
+func _show_win_dialog() -> void:
+	game_node.set_input_locked(true)
+	_win_dialog.popup_centered()
+
+func _on_win_continue() -> void:
+	continue_after_win = true
+	game_node.set_input_locked(false)
+
+func _on_win_end_run() -> void:
+	_end_run({"reason": "win"})
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event.is_pressed() or event.is_echo():
 		return
@@ -114,6 +155,7 @@ func _on_board_resized() -> void:
 		_board_panel_base_position = board_panel.position
 
 func _process(delta: float) -> void:
+	# Screen shake
 	if _shake_timer > 0.0:
 		_shake_timer = max(_shake_timer - delta, 0.0)
 		var progress := _shake_timer / _shake_duration if _shake_duration > 0.0 else 0.0
@@ -127,6 +169,12 @@ func _process(delta: float) -> void:
 	elif board_panel != null and board_panel.position != _board_panel_base_position:
 		board_panel.position = _board_panel_base_position
 
+	# Time pressure countdown
+	if time_pressure_enabled and not is_animating and _time_pressure_timer > 0.0:
+		_time_pressure_timer -= delta
+		if _time_pressure_timer <= 0.0:
+			_make_random_move()
+
 func _on_run_started(new_seed: int = 0, modifiers: Array = []) -> void:
 	current_seed = new_seed
 	active_modifiers = modifiers.duplicate(true)
@@ -135,17 +183,27 @@ func _on_run_started(new_seed: int = 0, modifiers: Array = []) -> void:
 
 func _start_new_run() -> void:
 	is_animating = false
-	score = 0
 	move_count = 0
 	highest_tile = 0
 	currency_earned = 0
+
+	# Apply starting score upgrade
+	var progression_node := _get_progression_node()
+	progression_config = progression_node.get_run_config() if progression_node != null else {}
+	score = int(progression_config.get("starting_score", 0))
 	undo_snapshot = {}
 	heavy_tiles_enabled = active_modifiers.has("heavy_tiles")
 	tiny_board_enabled = active_modifiers.has("tiny_board")
 	speed_mode_enabled = active_modifiers.has("speed_mode")
+	reverse_controls_enabled = active_modifiers.has("reverse_controls")
+	gravity_shift_enabled = active_modifiers.has("gravity_shift")
+	chaos_mode_enabled = active_modifiers.has("chaos_mode")
+	time_pressure_enabled = active_modifiers.has("time_pressure")
+	mega_tiles_enabled = active_modifiers.has("mega_tiles")
+	no_twos_enabled = active_modifiers.has("no_twos")
+	combo_chain_enabled = active_modifiers.has("combo_chain")
+	cursed_tile_enabled = active_modifiers.has("cursed_tile")
 	move_tween_duration = MOVE_TWEEN_BASE * (0.6 if speed_mode_enabled else 1.0)
-	var progression_node := _get_progression_node()
-	progression_config = progression_node.get_run_config() if progression_node != null else {}
 	var target_size := grid.get_default_size()
 	if tiny_board_enabled:
 		target_size = TINY_BOARD_SIZE
@@ -161,6 +219,11 @@ func _start_new_run() -> void:
 	for _i in range(starter_tiles):
 		_spawn_random_tile(4)
 	last_rng_state = rng_node.get_state() if rng_node.has_method("get_state") else 0
+
+	# Initialize time pressure timer
+	if time_pressure_enabled:
+		_time_pressure_timer = _time_pressure_duration
+
 	_update_hud()
 	_update_powerup_ui()
 
@@ -168,10 +231,17 @@ func _on_move_requested(direction: Vector2i) -> void:
 	if is_animating:
 		return
 	_capture_undo_state()
+
+	# Reverse controls modifier - invert direction
+	var final_direction := direction
+	if reverse_controls_enabled:
+		final_direction = direction * -1
+
 	var options: Dictionary = {}
 	if merge_boost_pending:
 		options["merge_multiplier"] = MERGE_BOOST_MULTIPLIER
-	var result: Dictionary = grid.step(direction, options)
+
+	var result: Dictionary = grid.step(final_direction, options)
 	if not result.get("moved", false):
 		return
 	if merge_boost_pending:
@@ -179,9 +249,30 @@ func _on_move_requested(direction: Vector2i) -> void:
 
 	is_animating = true
 	move_count += 1
-	score += int(result.get("score", 0))
+
+	# Combo chain modifier - multiply score based on merge count
+	var base_score := int(result.get("score", 0))
+	if combo_chain_enabled:
+		var merges: Array = result.get("merges", [])
+		var merge_count := merges.size()
+		if merge_count > 1:
+			# 2 merges = 1.5x, 3 merges = 2x, 4+ merges = 3x
+			var multiplier := 1.0 + (merge_count * 0.5)
+			base_score = int(base_score * multiplier)
+
+	# Apply combo master upgrade bonus
+	var combo_bonus := float(progression_config.get("combo_bonus", 0.0))
+	if combo_bonus > 0.0:
+		base_score = int(base_score * (1.0 + combo_bonus))
+
+	score += base_score
 	highest_tile = max(highest_tile, int(result.get("highest", highest_tile)))
 	game_node.set_input_locked(true)
+
+	# Reset time pressure timer after each move
+	if time_pressure_enabled:
+		_time_pressure_timer = _time_pressure_duration
+
 	_update_hud()
 	_update_powerup_ui()
 	_play_move_animation(result)
@@ -281,8 +372,9 @@ func _on_move_animation_finished(result: Dictionary) -> void:
 	_update_powerup_ui()
 
 func _check_win_condition() -> bool:
-	if highest_tile >= WIN_VALUE:
-		_end_run({"reason": "win"})
+	if highest_tile >= WIN_VALUE and not has_won:
+		has_won = true
+		_show_win_dialog()
 		return true
 	return false
 
@@ -292,7 +384,19 @@ func _spawn_random_tile(value_override: int = 0) -> Dictionary:
 		return {}
 	var index: int = rng_node.randi_range(0, empty.size() - 1)
 	var grid_pos: Vector2i = empty[index]
-	var value: int = value_override if value_override > 0 else rng_node.pick_random_tile_value(heavy_tiles_enabled)
+	var value: int = value_override if value_override > 0 else rng_node.pick_random_tile_value(
+		heavy_tiles_enabled,
+		mega_tiles_enabled,
+		no_twos_enabled,
+		chaos_mode_enabled
+	)
+
+	# Apply lucky spawns upgrade - chance to double the tile value
+	var lucky_chance := float(progression_config.get("lucky_spawn_chance", 0.0))
+	if lucky_chance > 0.0 and value_override == 0:  # Only apply to random spawns
+		if rng_node.randf() < lucky_chance:
+			value *= 2  # Lucky spawn!
+
 	var state := grid.spawn_tile(grid_pos, value)
 	if state.is_empty():
 		return {}
@@ -496,6 +600,12 @@ func _on_powerup_pressed(powerup: String) -> void:
 			_use_powerup_clear_lowest()
 		"merge_boost":
 			_use_powerup_merge_boost()
+		"duplicate":
+			_use_powerup_duplicate()
+		"nuke":
+			_use_powerup_nuke()
+		"rewind3":
+			_use_powerup_rewind3()
 
 func _use_powerup_undo() -> void:
 	if is_animating:
@@ -548,6 +658,77 @@ func _use_powerup_merge_boost() -> void:
 		return
 	powerup_charges["merge_boost"] = int(powerup_charges["merge_boost"]) - 1
 	merge_boost_pending = true
+	_update_powerup_ui()
+
+func _use_powerup_duplicate() -> void:
+	if is_animating:
+		return
+	if powerup_charges.get("duplicate", 0) <= 0:
+		return
+	var tile_states := grid.get_tile_states()
+	if tile_states.is_empty():
+		return
+	var empty_cells := grid.get_empty_cells()
+	if empty_cells.is_empty():
+		return
+
+	# Find highest tile
+	var highest_value := 0
+	for state in tile_states:
+		highest_value = max(highest_value, int(state.get("value", 0)))
+
+	# Spawn a copy of the highest tile
+	powerup_charges["duplicate"] = int(powerup_charges["duplicate"]) - 1
+	_spawn_random_tile(highest_value)
+	undo_snapshot = {}
+	_update_hud()
+	_update_powerup_ui()
+
+func _use_powerup_nuke() -> void:
+	if is_animating:
+		return
+	if powerup_charges.get("nuke", 0) <= 0:
+		return
+	var tile_states := grid.get_tile_states()
+	if tile_states.is_empty():
+		return
+
+	# Clear all tiles with value <= 8 (clears low tiles)
+	powerup_charges["nuke"] = int(powerup_charges["nuke"]) - 1
+	var tiles_to_clear: Array = []
+	for state in tile_states:
+		var value := int(state.get("value", 0))
+		if value <= 8:
+			var pos: Vector2i = state.get("position", Vector2i.ZERO)
+			tiles_to_clear.append(pos)
+
+	# Remove tiles from grid
+	for pos in tiles_to_clear:
+		grid.set_cell(pos, null)
+
+	# Rebuild visuals and spawn new tiles
+	_rebuild_tiles_from_grid()
+	for _i in range(min(2, tiles_to_clear.size())):
+		_spawn_random_tile()
+
+	undo_snapshot = {}
+	_update_hud()
+	_update_powerup_ui()
+	if not grid.can_move():
+		_end_run({"reason": "no_moves"})
+
+func _use_powerup_rewind3() -> void:
+	# Rewind 3 is just undo powerup, but it's a separate powerup
+	# For now, make it work like undo (future: implement multi-undo stack)
+	if is_animating:
+		return
+	if powerup_charges.get("rewind3", 0) <= 0:
+		return
+	if undo_snapshot.is_empty():
+		return
+	powerup_charges["rewind3"] = int(powerup_charges["rewind3"]) - 1
+	_restore_state_from_snapshot(undo_snapshot)
+	undo_snapshot = {}
 	_update_powerup_ui()
 
 func _capture_undo_state() -> void:
@@ -715,6 +896,13 @@ func _trigger_screen_shake(max_value: int, merge_count: int) -> void:
 	_shake_strength = min(strength, SHAKE_MAX_STRENGTH)
 	_shake_timer = _shake_duration
 
+func _make_random_move() -> void:
+	# Pick a random direction and try it
+	# If it doesn't work, game over will be triggered naturally
+	var directions := [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	var random_dir := directions[rng_node.randi_range(0, 3)]
+	_on_move_requested(random_dir)
+
 func _prepare_audio_streams() -> void:
 	merge_sound = _build_tone(420.0, 0.16, 0.38)
 	big_merge_sound = _build_tone(180.0, 0.32, 0.6)
@@ -754,9 +942,36 @@ func _calculate_currency_reward(reason: String) -> int:
 	var base := int(floor(score / 50.0))
 	var highest_bonus := int(round(highest_tile * 0.5))
 	var modifier_bonus := active_modifiers.size() * 5
-	var total := base + highest_bonus + modifier_bonus
+
+	# MODIFIER SYNERGY BONUSES - reward crazy combinations!
+	var synergy_bonus := 0
+	if active_modifiers.has("reverse_controls") and active_modifiers.has("speed_mode"):
+		synergy_bonus += 30  # "Speed Demon" - fast reversed controls
+	if active_modifiers.has("chaos_mode") and active_modifiers.has("combo_chain"):
+		synergy_bonus += 40  # "Chaos Theory" - unpredictable combos
+	if active_modifiers.has("time_pressure") and active_modifiers.has("tiny_board"):
+		synergy_bonus += 35  # "Pressure Cooker" - tight space + time limit
+	if active_modifiers.has("mega_tiles") and active_modifiers.has("no_twos"):
+		synergy_bonus += 25  # "Big League" - only big tiles
+	if active_modifiers.has("reverse_controls") and active_modifiers.has("time_pressure"):
+		synergy_bonus += 50  # "Nightmare Mode" - inverted controls under time pressure
+	if active_modifiers.has("chaos_mode") and active_modifiers.has("mega_tiles"):
+		synergy_bonus += 45  # "Wild West" - complete randomness
+	if active_modifiers.size() >= 4:
+		synergy_bonus += 60  # "Madman" - 4+ modifiers = insane bonus
+	if active_modifiers.size() >= 6:
+		synergy_bonus += 100  # "Absolute Chaos" - 6+ modifiers = massive bonus
+
+	var total := base + highest_bonus + modifier_bonus + synergy_bonus
+
 	if reason == "win":
 		total += 50
+		# Bonus for continuing after 2048
+		if continue_after_win:
+			var tiles_beyond_2048 := int(highest_tile / WIN_VALUE)
+			var continue_bonus := tiles_beyond_2048 * 25  # 25 per 2x above 2048
+			total += continue_bonus
+
 	var multiplier := float(progression_config.get("score_multiplier", 1.0))
 	total = int(round(total * multiplier))
 	return max(total, 0)

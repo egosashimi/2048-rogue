@@ -37,7 +37,37 @@ func shuffle_in_place(array: Array) -> void:
 		array[i] = array[j]
 		array[j] = tmp
 
-func pick_random_tile_value(heavy_tiles: bool = false) -> int:
+func pick_random_tile_value(heavy_tiles: bool = false, mega_tiles: bool = false, no_twos: bool = false, chaos_mode: bool = false) -> int:
+	# Chaos mode - completely random values including odd numbers!
+	if chaos_mode:
+		var chaos_values := [2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16]
+		return chaos_values[randi_range(0, chaos_values.size() - 1)]
+
+	# No twos mode - only 4+ tiles
+	if no_twos:
+		var roll := randf()
+		if roll < 0.7:
+			return 4
+		elif roll < 0.95:
+			return 8
+		else:
+			return 16
+
+	# Mega tiles mode - can spawn 16 or 32
+	if mega_tiles:
+		var roll := randf()
+		if roll < 0.6:
+			return 2
+		elif roll < 0.85:
+			return 4
+		elif roll < 0.95:
+			return 8
+		elif roll < 0.99:
+			return 16
+		else:
+			return 32
+
+	# Heavy tiles mode (existing)
 	var chance := HEAVY_TILE_CHANCE if heavy_tiles else STANDARD_TILE_CHANCE
 	var roll := randf()
 	if roll < chance:

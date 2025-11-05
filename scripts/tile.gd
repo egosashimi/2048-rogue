@@ -58,21 +58,13 @@ func _update_label() -> void:
 	var theme := get_theme()
 	if theme != null:
 		var style_name := _style_name_for_value(value)
-		print("Tile value ", value, " trying style: ", style_name)
-
 		var stylebox := theme.get_stylebox(style_name, "Tile")
 		if stylebox != null:
-			print("  Found stylebox! Type: ", stylebox.get_class())
-			if stylebox is StyleBoxFlat:
-				var flat_style := stylebox as StyleBoxFlat
-				print("  BG Color: ", flat_style.bg_color)
 			add_theme_stylebox_override("panel", stylebox)
 		else:
-			print("  ERROR: No stylebox found for '", style_name, "' in theme!")
-			# Try fallback
+			# Fallback to panel_2 if specific style not found
 			var fallback := theme.get_stylebox("panel_2", "Tile")
 			if fallback:
-				print("  Using fallback panel_2")
 				add_theme_stylebox_override("panel", fallback)
 
 		# Use dark font for bright backgrounds (yellow, lime, cyan, coral, mint)

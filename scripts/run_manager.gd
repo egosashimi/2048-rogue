@@ -7,7 +7,15 @@ signal run_completed(result: Dictionary)
 const ALLOWED_MODIFIERS := [
 	"heavy_tiles",
 	"tiny_board",
-	"speed_mode"
+	"speed_mode",
+	"reverse_controls",
+	"gravity_shift",
+	"chaos_mode",
+	"time_pressure",
+	"mega_tiles",
+	"no_twos",
+	"combo_chain",
+	"cursed_tile"
 ]
 
 var run_seed: int = 0
